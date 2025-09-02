@@ -30,16 +30,6 @@ header {
 
 #map {
   height: 70vh;
-  width: 100%;
-}
-.map-and-list {
-  display: flex;
-  gap: 20px;
-  padding: 0 20px 20px 20px;
-}
-
-#map {
-  height: 70vh;
   width: 70%;
 }
 
@@ -59,3 +49,4 @@ header {
 #church-list li {
   margin-bottom: 10px;
 }
+
