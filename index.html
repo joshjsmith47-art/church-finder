@@ -4,35 +4,30 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Church Finder</title>
-  
-  <!-- Leaflet CSS -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <header>
     <h1>Church Finder</h1>
-    <p>Locate churches near you instantly</p>
+    <input type="text" id="search" placeholder="Search by city...">
   </header>
 
   <main>
-    <div class="search-bar">
-      <input type="text" id="location-input" placeholder="Enter city or zip code">
-      <input type="number" id="radius-input" placeholder="Radius (km)" value="5" min="1" max="50">
-      <button id="search-btn">Search</button>
-    </div>
-
-    <div class="map-and-list">
-      <div id="map"></div>
-      <div id="church-list">
-        <h3>Nearby Churches</h3>
-        <ul id="list"></ul>
-      </div>
-    </div>
+    <ul id="church-list"></ul>
   </main>
 
-  <!-- Leaflet JS -->
-  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <!-- Side Panel / Drawer -->
+  <aside id="side-panel" class="side-panel">
+    <button id="close-panel">&times;</button>
+    <div id="panel-content">
+      <h2 id="panel-name"></h2>
+      <p><strong>Address:</strong> <span id="panel-address"></span></p>
+      <p><strong>Service Times:</strong> <span id="panel-times"></span></p>
+      <p><strong>Contact:</strong> <span id="panel-contact"></span></p>
+      <p><strong>Website:</strong> <a id="panel-website" href="#" target="_blank"></a></p>
+    </div>
+  </aside>
+
   <script src="script.js"></script>
 </body>
 </html>
