@@ -1,5 +1,5 @@
 // Initialize map
-let map = L.map('map').setView([39.8283, -98.5795], 4); // Center of USA
+let map = L.map('map').setView([39.8283, -98.5795], 4);
 
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
   attribution: '&copy; OpenStreetMap contributors'
@@ -10,9 +10,6 @@ document.getElementById('search-btn').addEventListener('click', () => {
   let radius = parseInt(document.getElementById('radius-input').value) || 5;
   if (!location) return alert("Please enter a city or zip code.");
 
-  console.log("Searching for:", location, "Radius:", radius);
-
-  // Use Nominatim to get coordinates
   fetch(`https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${encodeURIComponent(location)}`)
     .then(res => res.json())
     .then(data => {
@@ -20,7 +17,7 @@ document.getElementById('search-btn').addEventListener('click', () => {
       const lat = data[0].lat;
       const lon = data[0].lon;
       map.setView([lat, lon], 12);
-      fetchChurches(lat, lon, radius * 1000); // Convert km to meters
+      fetchChurches(lat, lon, radius * 1000);
     })
     .catch(err => {
       console.error("Error fetching location:", err);
@@ -43,7 +40,6 @@ function fetchChurches(lat, lon, radius) {
   })
   .then(res => res.json())
   .then(data => {
-    // Clear old markers
     if (window.markers) window.markers.forEach(m => map.removeLayer(m));
     window.markers = [];
     document.getElementById('list').innerHTML = '';
@@ -57,7 +53,7 @@ function fetchChurches(lat, lon, radius) {
       const name = church.tags.name || "Unnamed Church";
       const type = church.tags.religion || "Unknown type";
 
-      // Add marker to map
+      // Add marker
       const marker = L.marker([church.lat, church.lon])
         .addTo(map)
         .bindPopup(`<b>${name}</b><br>Type: ${type}`);
