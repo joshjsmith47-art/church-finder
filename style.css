@@ -1,4 +1,4 @@
-/* General Reset */
+/* Reset and base */
 * {
   box-sizing: border-box;
   margin: 0;
@@ -30,7 +30,7 @@ header p {
   opacity: 0.9;
 }
 
-/* Search bar */
+/* Search Bar */
 .search-bar {
   display: flex;
   justify-content: center;
@@ -73,7 +73,7 @@ header p {
   box-shadow: 0 4px 8px rgba(0,0,0,0.2);
 }
 
-/* Map and list container */
+/* Map and list */
 .map-and-list {
   display: flex;
   gap: 20px;
@@ -81,7 +81,6 @@ header p {
   flex-wrap: wrap;
 }
 
-/* Map */
 #map {
   flex: 1 1 60%;
   height: 70vh;
@@ -89,7 +88,6 @@ header p {
   box-shadow: 0 4px 10px rgba(0,0,0,0.1);
 }
 
-/* Church list */
 #church-list {
   flex: 1 1 35%;
   background-color: white;
@@ -125,7 +123,7 @@ header p {
   transform: translateX(3px);
 }
 
-/* Responsive design */
+/* Responsive */
 @media (max-width: 900px) {
   .map-and-list {
     flex-direction: column;
