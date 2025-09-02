@@ -1,4 +1,4 @@
-let map = L.map('map').setView([39.8283, -98.5795], 4);
+let map = L.map('map').setView([39.8283, -98.5795], 4); // Center of USA
 
 // Add OpenStreetMap tiles
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -10,6 +10,7 @@ document.getElementById('search-btn').addEventListener('click', () => {
   let radius = parseInt(document.getElementById('radius-input').value) || 5;
   if (!location) return alert("Please enter a city or zip code.");
 
+  // Get coordinates of the location using Nominatim
   fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${location}`)
     .then(res => res.json())
     .then(data => {
