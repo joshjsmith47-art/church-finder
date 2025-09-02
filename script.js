@@ -1,80 +1,82 @@
-// Initialize map
-let map = L.map('map').setView([39.8283, -98.5795], 4);
+// Sample Church Data
+const churchesData = [
+  {
+    name: "Grace Church",
+    city: "Cityville",
+    address: "123 Main St",
+    times: "Sun 10am & 6pm",
+    contact: "555-1234",
+    website: "https://gracechurch.com"
+  },
+  {
+    name: "Faith Chapel",
+    city: "Townsville",
+    address: "456 Oak Ave",
+    times: "Sun 9am & 5pm",
+    contact: "555-5678",
+    website: "https://faithchapel.org"
+  },
+  {
+    name: "Hope Ministries",
+    city: "Village",
+    address: "789 Pine Rd",
+    times: "Sat 6pm, Sun 11am",
+    contact: "555-9012",
+    website: "https://hopeministries.com"
+  }
+];
 
-// Add OpenStreetMap tiles
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-  attribution: '&copy; OpenStreetMap contributors'
-}).addTo(map);
+// DOM Elements
+const churchList = document.getElementById('church-list');
+const searchInput = document.getElementById('search');
+const sidePanel = document.getElementById('side-panel');
+const closeBtn = document.getElementById('close-panel');
+const panelName = document.getElementById('panel-name');
+const panelAddress = document.getElementById('panel-address');
+const panelTimes = document.getElementById('panel-times');
+const panelContact = document.getElementById('panel-contact');
+const panelWebsite = document.getElementById('panel-website');
 
-// Custom church icon
-const churchIcon = L.icon({
-  iconUrl: 'https://cdn-icons-png.flaticon.com/512/616/616408.png', // modern church icon
-  iconSize: [32, 32],
-  iconAnchor: [16, 32],
-  popupAnchor: [0, -32]
-});
+// Render Churches
+function renderChurches(filter = "") {
+  churchList.innerHTML = "";
+  const filtered = churchesData.filter(ch => ch.city.toLowerCase().includes(filter.toLowerCase()));
+  filtered.forEach(ch => {
+    const li = document.createElement('li');
+    li.className = 'church';
+    li.textContent = ch.name;
+    li.dataset.name = ch.name;
+    li.dataset.address = ch.address;
+    li.dataset.times = ch.times;
+    li.dataset.contact = ch.contact;
+    li.dataset.website = ch.website;
 
-// Search button click
-document.getElementById('search-btn').addEventListener('click', () => {
-  const location = document.getElementById('location-input').value.trim();
-  const radius = parseInt(document.getElementById('radius-input').value) || 5;
-  if (!location) return alert("Please enter a city or zip code.");
+    li.addEventListener('click', () => openPanel(ch));
+    churchList.appendChild(li);
+  });
 
-  fetch(`https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${encodeURIComponent(location)}`)
-    .then(res => res.json())
-    .then(data => {
-      if (!data || data.length === 0) return alert("Location not found.");
-      const lat = data[0].lat;
-      const lon = data[0].lon;
-      map.setView([lat, lon], 12);
-      fetchChurches(lat, lon, radius * 1000);
-    })
-    .catch(err => {
-      console.error("Error fetching location:", err);
-      alert("Error finding location. Try again.");
-    });
-});
+  if (filtered.length === 0) {
+    churchList.innerHTML = "<li style='text-align:center; padding:20px; color:#666;'>No churches found</li>";
+  }
+}
 
-function fetchChurches(lat, lon, radius) {
-  const query = `
-    [out:json];
-    node
-      ["amenity"="place_of_worship"]
-      (around:${radius},${lat},${lon});
-    out;
-  `;
+// Open Side Panel
+function openPanel(church) {
+  panelName.textContent = church.name;
+  panelAddress.textContent = church.address;
+  panelTimes.textContent = church.times;
+  panelContact.textContent = church.contact;
+  panelWebsite.textContent = church.website;
+  panelWebsite.href = church.website;
 
-  fetch('https://overpass-api.de/api/interpreter', {
-    method: 'POST',
-    body: query
-  })
-  .then(res => res.json())
-  .then(data => {
-    if (window.markers) window.markers.forEach(m => map.removeLayer(m));
-    window.markers = [];
-    document.getElementById('list').innerHTML = '';
+  sidePanel.classList.add('open');
+}
 
-    if (!data.elements || data.elements.length === 0) {
-      alert("No churches found in this area.");
-      return;
-    }
+// Close Side Panel
+closeBtn.addEventListener('click', () => sidePanel.classList.remove('open'));
 
-    data.elements.forEach(church => {
-      const name = church.tags.name || "Unnamed Church";
-      const type = church.tags.religion || "Unknown type";
+// Search Filter
+searchInput.addEventListener('input', () => renderChurches(searchInput.value));
 
-      // Add custom marker
-      const marker = L.marker([church.lat, church.lon], { icon: churchIcon })
-        .addTo(map)
-        .bindPopup(`<b>${name}</b><br>Type: ${type}`);
-      window.markers.push(marker);
-
-      // Add to list
-      const li = document.createElement('li');
-      li.textContent = `${name} (${type})`;
-      li.addEventListener('click', () => {
-        map.setView([church.lat, church.lon], 15);
-        marker.openPopup();
-      });
-      li.addEventListener('mouseover', () => marker.openPopup());
-      li.addEventListener('mouseout',
+// Initial Render
+renderChurches();
