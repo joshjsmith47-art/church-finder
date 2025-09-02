@@ -1,4 +1,4 @@
-/* Reset and base */
+/* Reset */
 * {
   box-sizing: border-box;
   margin: 0;
@@ -17,7 +17,7 @@ header {
   color: white;
   padding: 25px 20px;
   text-align: center;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 6px rgba(0,0,0,0.15);
 }
 
 header h1 {
@@ -85,14 +85,14 @@ header p {
   flex: 1 1 60%;
   height: 70vh;
   border-radius: 15px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
 }
 
 #church-list {
   flex: 1 1 35%;
   background-color: white;
   border-radius: 15px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
   padding: 15px;
   max-height: 70vh;
   overflow-y: auto;
@@ -121,6 +121,26 @@ header p {
 #church-list li:hover {
   background-color: #d9f0e1;
   transform: translateX(3px);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+
+/* Modern Leaflet popup */
+.leaflet-popup-content-wrapper {
+  border-radius: 12px;
+  background-color: #fff;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  font-family: 'Segoe UI', Roboto, Arial, sans-serif;
+  padding: 12px 15px;
+}
+
+.leaflet-popup-content {
+  margin: 0;
+  line-height: 1.4;
+  color: #333;
+}
+
+.leaflet-popup-tip {
+  background: #fff;
 }
 
 /* Responsive */
