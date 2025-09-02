@@ -18,14 +18,20 @@ header {
 
 .search-bar input {
   padding: 10px;
-  width: 300px;
   font-size: 16px;
+  margin-right: 5px;
 }
 
 .search-bar button {
   padding: 10px 20px;
   font-size: 16px;
   cursor: pointer;
+}
+
+.map-and-list {
+  display: flex;
+  gap: 20px;
+  padding: 0 20px 20px 20px;
 }
 
 #map {
@@ -48,5 +54,10 @@ header {
 
 #church-list li {
   margin-bottom: 10px;
+  cursor: pointer;
+  transition: background-color 0.2s;
 }
 
+#church-list li:hover {
+  background-color: #f0f0f0;
+}
