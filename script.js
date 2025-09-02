@@ -1,13 +1,23 @@
 // Initialize map
 let map = L.map('map').setView([39.8283, -98.5795], 4);
 
+// Add OpenStreetMap tiles
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
   attribution: '&copy; OpenStreetMap contributors'
 }).addTo(map);
 
+// Custom church icon
+const churchIcon = L.icon({
+  iconUrl: 'https://cdn-icons-png.flaticon.com/512/616/616408.png', // modern church icon
+  iconSize: [32, 32],
+  iconAnchor: [16, 32],
+  popupAnchor: [0, -32]
+});
+
+// Search button click
 document.getElementById('search-btn').addEventListener('click', () => {
   const location = document.getElementById('location-input').value.trim();
-  let radius = parseInt(document.getElementById('radius-input').value) || 5;
+  const radius = parseInt(document.getElementById('radius-input').value) || 5;
   if (!location) return alert("Please enter a city or zip code.");
 
   fetch(`https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${encodeURIComponent(location)}`)
@@ -53,8 +63,8 @@ function fetchChurches(lat, lon, radius) {
       const name = church.tags.name || "Unnamed Church";
       const type = church.tags.religion || "Unknown type";
 
-      // Add marker
-      const marker = L.marker([church.lat, church.lon])
+      // Add custom marker
+      const marker = L.marker([church.lat, church.lon], { icon: churchIcon })
         .addTo(map)
         .bindPopup(`<b>${name}</b><br>Type: ${type}`);
       window.markers.push(marker);
@@ -66,11 +76,5 @@ function fetchChurches(lat, lon, radius) {
         map.setView([church.lat, church.lon], 15);
         marker.openPopup();
       });
-      document.getElementById('list').appendChild(li);
-    });
-  })
-  .catch(err => {
-    console.error("Error fetching churches:", err);
-    alert("Error fetching churches. Try again later.");
-  });
-}
+      li.addEventListener('mouseover', () => marker.openPopup());
+      li.addEventListener('mouseout',
