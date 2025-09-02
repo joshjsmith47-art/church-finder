@@ -8,33 +8,54 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 document.getElementById('search-btn').addEventListener('click', () => {
   const location = document.getElementById('location-input').value;
   if (!location) return alert("Please enter a city or zip code.");
-  
-  // Use Nominatim to geocode the location
+
+  // Use Nominatim to get coordinates of location
   fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${location}`)
     .then(response => response.json())
     .then(data => {
       if (data.length === 0) return alert("Location not found.");
-      
+
       const lat = data[0].lat;
       const lon = data[0].lon;
       map.setView([lat, lon], 12);
 
-      // Remove old markers
-      if (window.markers) window.markers.forEach(m => map.removeLayer(m));
-      window.markers = [];
-
-      // For demo purposes: add a few sample churches nearby
-      const sampleChurches = [
-        { name: "St. Mary's Church", lat: lat*1 + 0.01, lon: lon*1 + 0.01 },
-        { name: "First Baptist Church", lat: lat*1 - 0.01, lon: lon*1 - 0.01 },
-        { name: "Community Church", lat: lat*1 + 0.015, lon: lon*1 - 0.015 }
-      ];
-
-      sampleChurches.forEach(church => {
-        const marker = L.marker([church.lat, church.lon]).addTo(map)
-          .bindPopup(`<b>${church.name}</b>`);
-        window.markers.push(marker);
-      });
+      // Fetch real churches nearby
+      fetchChurches(lat, lon);
     })
     .catch(err => alert("Error finding location: " + err));
 });
+
+function fetchChurches(lat, lon) {
+  const query = `
+    [out:json];
+    node
+      ["amenity"="place_of_worship"]
+      (around:5000,${lat},${lon});
+    out;
+  `;
+
+  fetch('https://overpass-api.de/api/interpreter', {
+    method: 'POST',
+    body: query
+  })
+  .then(res => res.json())
+  .then(data => {
+    // Remove old markers
+    if (window.markers) window.markers.forEach(m => map.removeLayer(m));
+    window.markers = [];
+
+    // Add new markers
+    data.elements.forEach(church => {
+      const name = church.tags.name || "Unnamed Church";
+      const marker = L.marker([church.lat, church.lon])
+        .addTo(map)
+        .bindPopup(`<b>${name}</b>`);
+      window.markers.push(marker);
+    });
+
+    if (data.elements.length === 0) {
+      alert("No churches found within 5km.");
+    }
+  })
+  .catch(err => alert("Error fetching churches: " + err));
+}
