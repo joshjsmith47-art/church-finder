@@ -1,4 +1,4 @@
-let map = L.map('map').setView([39.8283, -98.5795], 4); // Center of USA
+let map = L.map('map').setView([39.8283, -98.5795], 4);
 
 // Add OpenStreetMap tiles
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -7,11 +7,11 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 
 document.getElementById('search-btn').addEventListener('click', () => {
   const location = document.getElementById('location-input').value;
+  let radius = parseInt(document.getElementById('radius-input').value) || 5;
   if (!location) return alert("Please enter a city or zip code.");
 
-  // Use Nominatim to get coordinates of location
   fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${location}`)
-    .then(response => response.json())
+    .then(res => res.json())
     .then(data => {
       if (data.length === 0) return alert("Location not found.");
 
@@ -19,18 +19,17 @@ document.getElementById('search-btn').addEventListener('click', () => {
       const lon = data[0].lon;
       map.setView([lat, lon], 12);
 
-      // Fetch real churches nearby
-      fetchChurches(lat, lon);
+      fetchChurches(lat, lon, radius * 1000); // convert km to meters
     })
     .catch(err => alert("Error finding location: " + err));
 });
 
-function fetchChurches(lat, lon) {
+function fetchChurches(lat, lon, radius) {
   const query = `
     [out:json];
     node
       ["amenity"="place_of_worship"]
-      (around:5000,${lat},${lon});
+      (around:${radius},${lat},${lon});
     out;
   `;
 
@@ -43,18 +42,30 @@ function fetchChurches(lat, lon) {
     // Remove old markers
     if (window.markers) window.markers.forEach(m => map.removeLayer(m));
     window.markers = [];
+    document.getElementById('list').innerHTML = '';
 
-    // Add new markers
     data.elements.forEach(church => {
       const name = church.tags.name || "Unnamed Church";
+      const type = church.tags.religion || "Unknown type";
+      
+      // Add marker
       const marker = L.marker([church.lat, church.lon])
         .addTo(map)
-        .bindPopup(`<b>${name}</b>`);
+        .bindPopup(`<b>${name}</b><br>Type: ${type}`);
       window.markers.push(marker);
+
+      // Add to list
+      const li = document.createElement('li');
+      li.textContent = `${name} (${type})`;
+      li.addEventListener('click', () => {
+        map.setView([church.lat, church.lon], 15);
+        marker.openPopup();
+      });
+      document.getElementById('list').appendChild(li);
     });
 
     if (data.elements.length === 0) {
-      alert("No churches found within 5km.");
+      alert("No churches found within the selected radius.");
     }
   })
   .catch(err => alert("Error fetching churches: " + err));
