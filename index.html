@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Church Finder</title>
+<title>Church Finder by ZIP</title>
 <style>
 /* ===== Reset & Body ===== */
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -34,7 +34,7 @@ header h1 { margin-bottom: 10px; }
 
 <header>
   <h1>Church Finder</h1>
-  <input type="text" id="search" placeholder="Search by city...">
+  <input type="text" id="search" placeholder="Enter ZIP code...">
 </header>
 
 <main>
@@ -56,11 +56,11 @@ header h1 { margin-bottom: 10px; }
 </aside>
 
 <script>
-// ===== Sample Church Data =====
+// ===== Sample Church Data with ZIP =====
 const churchesData = [
-  { name: "Grace Church", city: "Cityville", address: "123 Main St", times: "Sun 10am & 6pm", contact: "555-1234", website: "https://gracechurch.com", lat: 40.7128, lng: -74.0060 },
-  { name: "Faith Chapel", city: "Townsville", address: "456 Oak Ave", times: "Sun 9am & 5pm", contact: "555-5678", website: "https://faithchapel.org", lat: 34.0522, lng: -118.2437 },
-  { name: "Hope Ministries", city: "Village", address: "789 Pine Rd", times: "Sat 6pm, Sun 11am", contact: "555-9012", website: "https://hopeministries.com", lat: 41.8781, lng: -87.6298 }
+  { name: "Grace Church", zip: "10001", address: "123 Main St, Cityville, NY", times: "Sun 10am & 6pm", contact: "555-1234", website: "https://gracechurch.com", lat: 40.7128, lng: -74.0060 },
+  { name: "Faith Chapel", zip: "90001", address: "456 Oak Ave, Townsville, CA", times: "Sun 9am & 5pm", contact: "555-5678", website: "https://faithchapel.org", lat: 34.0522, lng: -118.2437 },
+  { name: "Hope Ministries", zip: "60601", address: "789 Pine Rd, Village, IL", times: "Sat 6pm, Sun 11am", contact: "555-9012", website: "https://hopeministries.com", lat: 41.8781, lng: -87.6298 }
 ];
 
 // ===== DOM Elements =====
@@ -76,9 +76,9 @@ const panelWebsite = document.getElementById('panel-website');
 const panelMap = document.getElementById('panel-map');
 
 // ===== Render Churches =====
-function renderChurches(filter = "") {
+function renderChurches(zipFilter = "") {
   churchList.innerHTML = "";
-  const filtered = churchesData.filter(ch => ch.city.toLowerCase().includes(filter.toLowerCase()));
+  const filtered = churchesData.filter(ch => ch.zip.includes(zipFilter));
   filtered.forEach(ch => {
     const li = document.createElement('li');
     li.className = 'church';
@@ -99,7 +99,6 @@ function openPanel(church) {
   panelContact.textContent = church.contact;
   panelWebsite.textContent = church.website;
   panelWebsite.href = church.website;
-  // Map embed using iframe (no API key needed)
   panelMap.src = `https://www.google.com/maps?q=${church.lat},${church.lng}&hl=es;z=15&output=embed`;
   sidePanel.classList.add('open');
 }
@@ -107,8 +106,8 @@ function openPanel(church) {
 // ===== Close Side Panel =====
 closeBtn.addEventListener('click', () => sidePanel.classList.remove('open'));
 
-// ===== Search Filter =====
-searchInput.addEventListener('input', () => renderChurches(searchInput.value));
+// ===== ZIP Code Search =====
+searchInput.addEventListener('input', () => renderChurches(searchInput.value.trim()));
 
 // ===== Initial Render =====
 renderChurches();
