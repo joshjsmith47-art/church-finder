@@ -1,82 +1,88 @@
-// Sample Church Data
-const churchesData = [
+let map;
+let markers = [];
+let infoPanel = document.getElementById("church-info");
+
+const churches = [
   {
     name: "Grace Church",
-    city: "Cityville",
-    address: "123 Main St",
-    times: "Sun 10am & 6pm",
-    contact: "555-1234",
-    website: "https://gracechurch.com"
+    address: "123 Main St, City, State",
+    phone: "(555) 123-4567",
+    website: "https://gracechurch.com",
+    lat: 40.7128,
+    lng: -74.0060
   },
   {
-    name: "Faith Chapel",
-    city: "Townsville",
-    address: "456 Oak Ave",
-    times: "Sun 9am & 5pm",
-    contact: "555-5678",
-    website: "https://faithchapel.org"
+    name: "Faith Community",
+    address: "456 Oak Ave, City, State",
+    phone: "(555) 987-6543",
+    website: "https://faithcommunity.org",
+    lat: 40.7228,
+    lng: -74.0160
   },
-  {
-    name: "Hope Ministries",
-    city: "Village",
-    address: "789 Pine Rd",
-    times: "Sat 6pm, Sun 11am",
-    contact: "555-9012",
-    website: "https://hopeministries.com"
-  }
+  // Add more churches here
 ];
 
-// DOM Elements
-const churchList = document.getElementById('church-list');
-const searchInput = document.getElementById('search');
-const sidePanel = document.getElementById('side-panel');
-const closeBtn = document.getElementById('close-panel');
-const panelName = document.getElementById('panel-name');
-const panelAddress = document.getElementById('panel-address');
-const panelTimes = document.getElementById('panel-times');
-const panelContact = document.getElementById('panel-contact');
-const panelWebsite = document.getElementById('panel-website');
-
-// Render Churches
-function renderChurches(filter = "") {
-  churchList.innerHTML = "";
-  const filtered = churchesData.filter(ch => ch.city.toLowerCase().includes(filter.toLowerCase()));
-  filtered.forEach(ch => {
-    const li = document.createElement('li');
-    li.className = 'church';
-    li.textContent = ch.name;
-    li.dataset.name = ch.name;
-    li.dataset.address = ch.address;
-    li.dataset.times = ch.times;
-    li.dataset.contact = ch.contact;
-    li.dataset.website = ch.website;
-
-    li.addEventListener('click', () => openPanel(ch));
-    churchList.appendChild(li);
+function initMap() {
+  map = new google.maps.Map(document.getElementById("map"), {
+    center: { lat: 40.7128, lng: -74.0060 }, // default center
+    zoom: 12
   });
-
-  if (filtered.length === 0) {
-    churchList.innerHTML = "<li style='text-align:center; padding:20px; color:#666;'>No churches found</li>";
-  }
 }
 
-// Open Side Panel
-function openPanel(church) {
-  panelName.textContent = church.name;
-  panelAddress.textContent = church.address;
-  panelTimes.textContent = church.times;
-  panelContact.textContent = church.contact;
-  panelWebsite.textContent = church.website;
-  panelWebsite.href = church.website;
-
-  sidePanel.classList.add('open');
+function clearMarkers() {
+  markers.forEach(marker => marker.setMap(null));
+  markers = [];
 }
 
-// Close Side Panel
-closeBtn.addEventListener('click', () => sidePanel.classList.remove('open'));
+function showChurchInfo(church) {
+  document.getElementById("church-name").textContent = church.name;
+  document.getElementById("church-address").textContent = church.address;
+  document.getElementById("church-phone").textContent = church.phone;
+  document.getElementById("church-website").innerHTML = `<a href="${church.website}" target="_blank">${church.website}</a>`;
+  infoPanel.style.display = "block";
+}
 
-// Search Filter
-searchInput.addEventListener('input', () => renderChurches(searchInput.value));
+document.getElementById("close-info").addEventListener("click", () => {
+  infoPanel.style.display = "none";
+});
 
-// Initial Render
-renderChurches();
+document.getElementById("search-btn").addEventListener("click", () => {
+  const locationInput = document.getElementById("location-input").value;
+  const radius = parseInt(document.getElementById("radius-input").value) || 10;
+
+  if (!locationInput) return alert("Please enter a city or ZIP code.");
+
+  const geocoder = new google.maps.Geocoder();
+  geocoder.geocode({ address: locationInput }, (results, status) => {
+    if (status === "OK") {
+      const userLocation = results[0].geometry.location;
+      map.setCenter(userLocation);
+      map.setZoom(12);
+      
+      clearMarkers();
+
+      churches.forEach(church => {
+        const distance = google.maps.geometry.spherical.computeDistanceBetween(
+          userLocation,
+          new google.maps.LatLng(church.lat, church.lng)
+        ) / 1609.34; // meters to miles
+
+        if (distance <= radius) {
+          const marker = new google.maps.Marker({
+            position: { lat: church.lat, lng: church.lng },
+            map: map,
+            title: church.name
+          });
+
+          marker.addListener("click", () => showChurchInfo(church));
+          markers.push(marker);
+        }
+      });
+
+    } else {
+      alert("Location not found: " + status);
+    }
+  });
+});
+
+window.onload = initMap;
