@@ -1,33 +1,170 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Church Finder</title>
-  <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Church Finder</title>
+<style>
+/* ===== Body & Reset ===== */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: #f9f9f9;
+  color: #333;
+  min-height: 100vh;
+}
+
+/* ===== Header ===== */
+header {
+  background: #007BFF;
+  color: #fff;
+  padding: 20px;
+  text-align: center;
+}
+header h1 { margin-bottom: 10px; }
+#search {
+  width: 90%;
+  max-width: 400px;
+  padding: 10px;
+  border-radius: 6px;
+  border: none;
+  font-size: 16px;
+}
+
+/* ===== Church List ===== */
+#church-list {
+  list-style: none;
+  max-width: 600px;
+  margin: 20px auto;
+  padding: 0 10px;
+}
+.church {
+  background: #fff;
+  padding: 15px 20px;
+  margin-bottom: 12px;
+  border-radius: 10px;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.church:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+}
+
+/* ===== Side Panel / Drawer ===== */
+.side-panel {
+  position: fixed;
+  top: 0;
+  right: -400px;
+  width: 350px;
+  max-width: 90%;
+  height: 100%;
+  background: #fff;
+  box-shadow: -4px 0 20px rgba(0,0,0,0.2);
+  padding: 20px;
+  transition: right 0.3s ease;
+  z-index: 1000;
+  overflow-y: auto;
+}
+.side-panel.open { right: 0; }
+#close-panel {
+  font-size: 28px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  float: right;
+  margin-bottom: 20px;
+  color: #333;
+}
+.side-panel h2 { color: #007BFF; margin-bottom: 15px; }
+.side-panel p { margin: 8px 0; }
+.side-panel a {
+  color: #007BFF;
+  text-decoration: none;
+}
+.side-panel a:hover { text-decoration: underline; }
+
+</style>
 </head>
 <body>
-  <header>
-    <h1>Church Finder</h1>
-    <input type="text" id="search" placeholder="Search by city...">
-  </header>
 
-  <main>
-    <ul id="church-list"></ul>
-  </main>
+<header>
+  <h1>Church Finder</h1>
+  <input type="text" id="search" placeholder="Search by city...">
+</header>
 
-  <!-- Side Panel / Drawer -->
-  <aside id="side-panel" class="side-panel">
-    <button id="close-panel">&times;</button>
-    <div id="panel-content">
-      <h2 id="panel-name"></h2>
-      <p><strong>Address:</strong> <span id="panel-address"></span></p>
-      <p><strong>Service Times:</strong> <span id="panel-times"></span></p>
-      <p><strong>Contact:</strong> <span id="panel-contact"></span></p>
-      <p><strong>Website:</strong> <a id="panel-website" href="#" target="_blank"></a></p>
-    </div>
-  </aside>
+<main>
+  <ul id="church-list"></ul>
+</main>
 
-  <script src="script.js"></script>
+<!-- Side Panel -->
+<aside id="side-panel" class="side-panel">
+  <button id="close-panel">&times;</button>
+  <div id="panel-content">
+    <h2 id="panel-name"></h2>
+    <p><strong>Address:</strong> <span id="panel-address"></span></p>
+    <p><strong>Service Times:</strong> <span id="panel-times"></span></p>
+    <p><strong>Contact:</strong> <span id="panel-contact"></span></p>
+    <p><strong>Website:</strong> <a id="panel-website" href="#" target="_blank"></a></p>
+  </div>
+</aside>
+
+<script>
+// ===== Sample Church Data =====
+const churchesData = [
+  { name: "Grace Church", city: "Cityville", address: "123 Main St", times: "Sun 10am & 6pm", contact: "555-1234", website: "https://gracechurch.com" },
+  { name: "Faith Chapel", city: "Townsville", address: "456 Oak Ave", times: "Sun 9am & 5pm", contact: "555-5678", website: "https://faithchapel.org" },
+  { name: "Hope Ministries", city: "Village", address: "789 Pine Rd", times: "Sat 6pm, Sun 11am", contact: "555-9012", website: "https://hopeministries.com" }
+];
+
+// ===== DOM Elements =====
+const churchList = document.getElementById('church-list');
+const searchInput = document.getElementById('search');
+const sidePanel = document.getElementById('side-panel');
+const closeBtn = document.getElementById('close-panel');
+const panelName = document.getElementById('panel-name');
+const panelAddress = document.getElementById('panel-address');
+const panelTimes = document.getElementById('panel-times');
+const panelContact = document.getElementById('panel-contact');
+const panelWebsite = document.getElementById('panel-website');
+
+// ===== Render Churches =====
+function renderChurches(filter = "") {
+  churchList.innerHTML = "";
+  const filtered = churchesData.filter(ch => ch.city.toLowerCase().includes(filter.toLowerCase()));
+  filtered.forEach(ch => {
+    const li = document.createElement('li');
+    li.className = 'church';
+    li.textContent = ch.name;
+    li.addEventListener('click', () => openPanel(ch));
+    churchList.appendChild(li);
+  });
+  if (filtered.length === 0) {
+    churchList.innerHTML = "<li style='text-align:center; padding:20px; color:#666;'>No churches found</li>";
+  }
+}
+
+// ===== Open Side Panel =====
+function openPanel(church) {
+  panelName.textContent = church.name;
+  panelAddress.textContent = church.address;
+  panelTimes.textContent = church.times;
+  panelContact.textContent = church.contact;
+  panelWebsite.textContent = church.website;
+  panelWebsite.href = church.website;
+  sidePanel.classList.add('open');
+}
+
+// ===== Close Side Panel =====
+closeBtn.addEventListener('click', () => sidePanel.classList.remove('open'));
+
+// ===== Search Filter =====
+searchInput.addEventListener('input', () => renderChurches(searchInput.value));
+
+// ===== Initial Render =====
+renderChurches();
+</script>
+
 </body>
 </html>
