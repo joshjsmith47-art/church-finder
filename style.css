@@ -1,94 +1,62 @@
-/* Reset & body */
-* {
-  box-sizing: border-box;
+body {
+  font-family: 'Roboto', sans-serif;
   margin: 0;
   padding: 0;
-}
-body {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background: #f9f9f9;
-  color: #333;
-  min-height: 100vh;
+  background-color: #f7f9fc;
 }
 
-/* Header */
 header {
-  background: #007BFF;
-  color: #fff;
-  padding: 20px;
   text-align: center;
-}
-header h1 {
-  margin-bottom: 10px;
-}
-#search {
-  width: 90%;
-  max-width: 400px;
-  padding: 10px;
-  border-radius: 6px;
-  border: none;
-  font-size: 16px;
-}
-
-/* Church List */
-#church-list {
-  list-style: none;
-  max-width: 600px;
-  margin: 20px auto;
-  padding: 0 10px;
-}
-.church {
-  background: #fff;
-  padding: 15px 20px;
-  margin-bottom: 12px;
-  border-radius: 10px;
-  cursor: pointer;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-  transition: transform 0.2s, box-shadow 0.2s;
-}
-.church:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 15px rgba(0,0,0,0.1);
-}
-
-/* Side Panel / Drawer */
-.side-panel {
-  position: fixed;
-  top: 0;
-  right: -400px;
-  width: 350px;
-  max-width: 90%;
-  height: 100%;
-  background: #fff;
-  box-shadow: -4px 0 20px rgba(0,0,0,0.2);
   padding: 20px;
-  transition: right 0.3s ease;
-  z-index: 1000;
-  overflow-y: auto;
+  background-color: #4a90e2;
+  color: white;
 }
-.side-panel.open {
-  right: 0;
+
+.search-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 20px;
+  gap: 10px;
 }
-#close-panel {
-  font-size: 28px;
-  background: none;
+
+.search-container input, .search-container button {
+  padding: 10px;
+  font-size: 16px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+.search-container button {
+  background-color: #4a90e2;
+  color: white;
   border: none;
   cursor: pointer;
-  float: right;
-  margin-bottom: 20px;
-  color: #333;
 }
-.side-panel h2 {
-  color: #007BFF;
-  margin-bottom: 15px;
+
+#map {
+  width: 100%;
+  height: 600px;
 }
-.side-panel p {
-  margin: 8px 0;
+
+.info-panel {
+  position: absolute;
+  top: 100px;
+  right: 20px;
+  background-color: white;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+  display: none;
+  max-width: 300px;
 }
-.side-panel a {
-  color: #007BFF;
-  text-decoration: none;
-}
-.side-panel a:hover {
-  text-decoration: underline;
+
+.info-panel button {
+  margin-top: 10px;
+  padding: 8px 12px;
+  background-color: #4a90e2;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
 }
