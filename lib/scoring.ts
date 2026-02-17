@@ -1,73 +1,29 @@
-import { DIRECTIONS, Direction, QuizResult } from '@/lib/types';
+import { preferenceItemText } from '@/data/quizQuestions';
+import { PREFERENCE_ITEM_IDS, PreferenceItemId, QuizResult, SetAnswer } from '@/lib/types';
 
-const cfpByDirection: Record<Direction, string> = {
-  Spirit: 'Worship Enthusiast',
-  Intellect: 'Intellectual Explorer',
-  Community: 'Relational Connector',
-  Mission: 'Missional Pioneer'
-};
+export function computeQuizResult(answers: Record<number, SetAnswer>): QuizResult {
+  const itemScores = PREFERENCE_ITEM_IDS.reduce(
+    (acc, itemId) => ({ ...acc, [itemId]: 0 }),
+    {} as Record<PreferenceItemId, number>
+  );
 
-const oppositeDirection: Record<Direction, Direction> = {
-  Spirit: 'Mission',
-  Mission: 'Spirit',
-  Intellect: 'Community',
-  Community: 'Intellect'
-};
-
-export function questionWeight(questionId: number): number {
-  return questionId === 1 || questionId === 25 ? 2 : 1;
-}
-
-export function rankDirections(totals: Record<Direction, number>): Direction[] {
-  return [...DIRECTIONS].sort((a, b) => {
-    if (totals[b] !== totals[a]) {
-      return totals[b] - totals[a];
+  Object.values(answers).forEach((answer) => {
+    if (answer.most) {
+      itemScores[answer.most] += 1;
     }
-    return DIRECTIONS.indexOf(a) - DIRECTIONS.indexOf(b);
+    if (answer.least) {
+      itemScores[answer.least] -= 1;
+    }
   });
-}
 
-export function computeGrowthStretch(
-  totals: Record<Direction, number>,
-  primaryDirection: Direction
-): Direction {
-  const nonPrimary = DIRECTIONS.filter((direction) => direction !== primaryDirection);
-  const lowestScore = Math.min(...nonPrimary.map((direction) => totals[direction]));
-  const lowestDirections = nonPrimary.filter((direction) => totals[direction] === lowestScore);
-
-  if (lowestDirections.length === 1) {
-    return lowestDirections[0];
-  }
-
-  const opposite = oppositeDirection[primaryDirection];
-  if (lowestDirections.includes(opposite)) {
-    return opposite;
-  }
-
-  return lowestDirections[0];
-}
-
-export function computeQuizResult(answers: Record<number, Direction>): QuizResult {
-  const totals: Record<Direction, number> = {
-    Spirit: 0,
-    Intellect: 0,
-    Community: 0,
-    Mission: 0
-  };
-
-  for (const [questionId, direction] of Object.entries(answers)) {
-    totals[direction] += questionWeight(Number(questionId));
-  }
-
-  const ranked = rankDirections(totals);
-  const [primaryDirection, secondaryDirection] = ranked;
+  const rankedItems = [...PREFERENCE_ITEM_IDS]
+    .map((itemId) => ({ itemId, text: preferenceItemText[itemId], score: itemScores[itemId] }))
+    .sort((a, b) => b.score - a.score || a.itemId.localeCompare(b.itemId));
 
   return {
-    totals,
-    primaryDirection,
-    secondaryDirection,
-    primaryCFP: cfpByDirection[primaryDirection],
-    secondaryCFP: cfpByDirection[secondaryDirection],
-    growthStretchDirection: computeGrowthStretch(totals, primaryDirection)
+    itemScores,
+    rankedItems,
+    topPreferences: rankedItems.slice(0, 5),
+    lowPreferences: [...rankedItems].reverse().slice(0, 5)
   };
 }
