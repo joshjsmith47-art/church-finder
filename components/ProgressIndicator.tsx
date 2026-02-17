@@ -15,12 +15,12 @@ export function ProgressIndicator({
           {current} / {total}
         </span>
       </div>
-      <div style={{ background: '#e5e7eb', borderRadius: 999, height: 10 }}>
+      <div style={{ background: 'var(--secondary)', borderRadius: 999, height: 10, border: '1px solid var(--border)' }}>
         <div
           style={{
             width: `${percent}%`,
             height: '100%',
-            background: '#2563eb',
+            background: 'var(--primary)',
             borderRadius: 999,
             transition: 'width 150ms ease'
           }}

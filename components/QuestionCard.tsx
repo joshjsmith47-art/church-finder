@@ -19,7 +19,7 @@ export function QuestionCard({
             <div className="actions">
               <button
                 className="btn"
-                style={{ background: selected.most === option.itemId ? '#dcfce7' : '#e5e7eb' }}
+                style={{ background: selected.most === option.itemId ? 'var(--success)' : 'var(--secondary)', borderColor: 'var(--border)' }}
                 onClick={() => onSelect('most', option.itemId)}
                 type="button"
               >
@@ -27,7 +27,7 @@ export function QuestionCard({
               </button>
               <button
                 className="btn"
-                style={{ background: selected.least === option.itemId ? '#fee2e2' : '#e5e7eb' }}
+                style={{ background: selected.least === option.itemId ? 'var(--danger)' : 'var(--secondary)', borderColor: 'var(--border)' }}
                 onClick={() => onSelect('least', option.itemId)}
                 type="button"
               >

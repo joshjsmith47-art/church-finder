@@ -11,7 +11,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en">
       <body>
-        <header style={{ borderBottom: '1px solid #e5e7eb', background: '#fff' }}>
+        <header style={{ borderBottom: '1px solid var(--border)', background: 'rgba(11,16,32,0.92)', backdropFilter: 'blur(6px)' }}>
           <nav className="container" style={{ display: 'flex', gap: '1rem', padding: '1rem 0' }}>
             <Link href="/">Church Compass</Link>
             <Link href="/quiz">Quiz</Link>
