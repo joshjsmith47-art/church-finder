@@ -1,5 +1,26 @@
 import { describe, expect, it } from 'vitest';
-import { computeQuizResult } from '../lib/scoring';
+import { quizQuestions } from '@/data/quizQuestions';
+import { computeQuizResult } from '@/lib/scoring';
+import { PREFERENCE_ITEM_IDS } from '@/lib/types';
+
+describe('quiz design', () => {
+  it('uses 15 sets, 4 options each, with each item shown exactly 3 times', () => {
+    expect(quizQuestions).toHaveLength(15);
+
+    const counts = Object.fromEntries(PREFERENCE_ITEM_IDS.map((itemId) => [itemId, 0]));
+
+    quizQuestions.forEach((question) => {
+      expect(question.options).toHaveLength(4);
+      question.options.forEach((option) => {
+        counts[option.itemId] += 1;
+      });
+    });
+
+    PREFERENCE_ITEM_IDS.forEach((itemId) => {
+      expect(counts[itemId]).toBe(3);
+    });
+  });
+});
 
 describe('computeQuizResult', () => {
   it('assigns +1 for MOST and -1 for LEAST', () => {

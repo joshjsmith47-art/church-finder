@@ -4,6 +4,16 @@ import Link from 'next/link';
 import { useMemo } from 'react';
 import { readStoredResult } from '@/lib/storage';
 
+const scoreMeaning: Record<number, string> = {
+  3: 'Critical driver (likely dealbreaker if absent)',
+  2: 'Strong preference',
+  1: 'Moderate preference',
+  0: 'Neutral',
+  [-1]: 'Low priority',
+  [-2]: 'Very low priority',
+  [-3]: 'Potential negative'
+};
+
 export default function ResultsPage() {
   const result = useMemo(() => readStoredResult(), []);
 
@@ -45,6 +55,19 @@ export default function ResultsPage() {
               {item.score})
             </li>
           ))}
+        </ul>
+      </section>
+
+      <section className="card" style={{ marginTop: '1rem' }}>
+        <h2 style={{ marginTop: 0 }}>Score Interpretation</h2>
+        <ul>
+          {Object.entries(scoreMeaning)
+            .sort(([a], [b]) => Number(b) - Number(a))
+            .map(([score, meaning]) => (
+              <li key={score}>
+                <strong>{Number(score) > 0 ? '+' : ''}{score}</strong>: {meaning}
+              </li>
+            ))}
         </ul>
       </section>
 
