@@ -3,8 +3,8 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 
 export const metadata: Metadata = {
-  title: 'Church Compass Lite',
-  description: 'Find your church direction with a lightweight quiz.'
+  title: 'Church Compass CPQ',
+  description: 'Find your church preferences with the CPQ MaxDiff quiz.'
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
